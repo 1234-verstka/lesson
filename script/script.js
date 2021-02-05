@@ -1,81 +1,92 @@
 'use strict';
 
-let money = +prompt('Ваш месячный доход?', 40000);
 
-
-let income = 'фриланс';
-
-
-let addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую',
-    'бензин,коммуналка,обед');
-
-
-let deposit = confirm('Есть ли у вас депозит в банке?');
-
-let mission = 100000; 
-let period = 12; // число от 1 до 12 (месяцев)
-// console.log(`Период равен ${period} месяцев.
-//     Цель заработать ${mission} рублей/долларов/гривен/юани`);
-
-
-let expenses1 = prompt('Введите обязательную статью расходов?', 'бензин');
-let amount1 = +prompt('Во сколько это обойдется?', 10000);
-let expenses2 = prompt('Введите обязательную статью расходов?', 'садик, продукты');
-let amount2 = +prompt('Во сколько это обойдется?', 5000);
-
-
-const getExpensesMonth = function() {
-    return amount1 + amount2;
+const isNumber = (n) => {
+  console.log('n: ', n);
+  console.log(parseFloat(n));
+  console.log(isFinite(n));
+  return !isNaN(parseFloat(n)) && isFinite(n);
 };
 
+let money,
+  income = 'фриланс',
+  addExpenses = prompt('Перечислите возможные расходы за рассчитываемый период через запятую',
+      'интернет, такси, коммуналка'),
+  deposit = confirm('Есть ли у вас депозит в банке?'),
+  mission = 100000,
+  period = 12;
+
+// 1) Переписать функцию start циклом do while
+do {
+  money = prompt('Ваш месячный доход?');
+} while (!isNumber(money));
+
+let expenses = [];
+// 2) Добавить проверку что введённые данные являются числом, которые мы получаем 
+// на вопрос 'Во сколько это обойдется?’ в функции  getExpensesMonth
+const getExpensesMonth = () => {
+  let sum = 0;
+  for (let i = 0; i < 4; i++) {
+      expenses[i] = prompt('Введите обязательную статью расходов?');
+      sum += (() => {
+          let n = 0;
+          do {
+              n = prompt('Во сколько это обойдется?');
+          } while (!isNumber(n));
+          return +n;
+      })();
+  }
+  return sum;
+};
+
+let expensesAmount = getExpensesMonth();
 
 const getAccumulatedMonth = (moneyMonth, expensesMonth) => {
-    if (!moneyMonth) { moneyMonth = 0; }
-    return moneyMonth - expensesMonth;
+  if (!moneyMonth) {
+      moneyMonth = 0;
+  }
+  return moneyMonth - expensesMonth;
 };
 
-const accumulatedMonth = getAccumulatedMonth(money, getExpensesMonth());
-
+const accumulatedMonth = getAccumulatedMonth(money, expensesAmount);
 
 const getTargetMonth = (myMiss, budgetMonth) => {
-    return Math.ceil(myMiss / budgetMonth);
+  return Math.ceil(myMiss / budgetMonth);
 };
 
+const targetMonth = getTargetMonth(mission, accumulatedMonth);
 
 const budgetDay = accumulatedMonth / 30;
 
 const showTypeOf = (data) => {
-    console.log(data, typeof (data));
+  console.log(data, typeof (data));
 };
 
 showTypeOf(money);
 showTypeOf(income);
 showTypeOf(deposit);
 
-
-console.log('Обязательные расходы за месяц: ', getExpensesMonth());
-
-
 console.log(addExpenses.toLocaleLowerCase().split(', '));
+console.log('Обязательные расходы за месяц: ', expensesAmount);
+
+// 3) Если getTargetMonth возвращает нам отрицательное значение, то вместо “Цель будет достигнута” 
+// необходимо выводить “Цель не будет достигнута”
+(targetMonth >= 0) ?
+  console.log(`Цель будет достигнута за: ${targetMonth} месяцев`) :
+  console.log(`Цель не будет достигнута`);
+
+  console.log('Бюджет на день: ', Math.floor(budgetDay));
 
 
-console.log(`Цель будет достигнута за: ${getTargetMonth(mission, accumulatedMonth)} месяцев`);
-
-
-console.log('Бюджет на день: ', Math.floor(budgetDay));
-
-
-let getStatusIncome = function(){
-if (budgetDay > 1200) {
-  return('У вас высокий уровень дохода');
-} else if (budgetDay < 1200 && budgetDay > 600) {
-  return ('У вас средний уровень дохода');
-}else if (budgetDay < 600 && budgetDay > 0) {
-  return ('К сожалению у вас уровень дохода ниже среднего')
- }else if (budgetDay < 0) {
-  return ('Что то пошло не так');
-  } 
+let getStatusIncome = function () {
+  if (budgetDay > 1200) {
+    return ('У вас высокий уровень дохода');
+  } else if (budgetDay < 1200 && budgetDay > 600) {
+    return ('У вас средний уровень дохода');
+  } else if (budgetDay < 600 && budgetDay > 0) {
+    return ('К сожалению у вас уровень дохода ниже среднего')
+  } else if (budgetDay < 0) {
+    return ('Что то пошло не так');
+  }
 };
 console.log(getStatusIncome())
-
-
